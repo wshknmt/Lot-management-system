@@ -26,7 +26,7 @@ public class DbFunctions {
         return conn;
     }
 
-    private void executeQuery(Connection conn, String query) {
+    private static void executeQuery(Connection conn, String query) {
         Statement statement;
         try {
             statement=conn.createStatement();
@@ -36,38 +36,38 @@ public class DbFunctions {
         }
     }
 
-    public void addNewFlight(Connection conn, String flightNumber, String origin, String destination, LocalDateTime startTimestamp, Integer seatsAvailableAmount) {
+    public static void addNewFlight(Connection conn, String flightNumber, String origin, String destination, LocalDateTime startTimestamp, Integer seatsAvailableAmount) {
         String query=String.format("INSERT INTO Flight(Flight_Number, Origin, Destination, Start_Timestamp, Seats_Available_Amount) VALUES('%s','%s','%s','%s','%d');", flightNumber, origin, destination, startTimestamp, seatsAvailableAmount);
         executeQuery(conn, query);
         System.out.println("Row Inserted");
     }
 
-    public void addNewPassenger(Connection conn, String name, String surname, BigInteger phoneNumber) {
+    public static void addNewPassenger(Connection conn, String name, String surname, BigInteger phoneNumber) {
         String query=String.format("INSERT INTO  Passenger(Name, Surname, Phone_Number) VALUES('%s','%s','%d');",name,surname, phoneNumber);
         executeQuery(conn, query);
         System.out.println("Row Inserted");
     }
 
-    public void addNewReservation(Connection conn, Integer passengerId, Integer flightId) {
-        String query=String.format("INSERT INTO  Reservations(passengerId, flightId) VALUES('%d','%d');",passengerId, flightId);
+    public static void addNewReservation(Connection conn, Integer passengerId, String flightId) {
+        String query=String.format("INSERT INTO  Reservation(passenger_Id, flight_Id) VALUES('%d','%s');",passengerId, flightId);
         executeQuery(conn, query);
         System.out.println("Row Inserted");
     }
 
-    public void deleteFlight(Connection conn, String flightNumber) {
+    public static void deleteFlight(Connection conn, String flightNumber) {
         String query=String.format("DELETE FROM Flight WHERE Flight_Number = '%s';",flightNumber);
         executeQuery(conn, query);
         System.out.println("Row deleted");
     }
 
-    public void deletePassenger(Connection conn, Integer passengerId) {
+    public static void deletePassenger(Connection conn, Integer passengerId) {
         String query=String.format("DELETE FROM Passenger WHERE Id = '%d';",passengerId);
         executeQuery(conn, query);
         System.out.println("Row deleted");
     }
 
-    public void deleteReservation(Connection conn, Integer reservationId) {
-        String query=String.format("DELETE FROM Reservations WHERE Id = '%d';",reservationId);
+    public static void deleteReservation(Connection conn, Integer reservationId) {
+        String query=String.format("DELETE FROM Reservation WHERE Id = '%d';",reservationId);
         executeQuery(conn, query);
         System.out.println("Row deleted");
     }
@@ -189,7 +189,7 @@ public class DbFunctions {
         return passengers;
     }
 
-    public static List<Reservation> searchReservations(Connection conn, Integer id, Integer passengerId, Integer flightId) {
+    public static List<Reservation> searchReservations(Connection conn, Integer id, Integer passengerId, String flightId) {
         List<Reservation> reservations = new ArrayList<>();
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
@@ -202,8 +202,8 @@ public class DbFunctions {
             if (passengerId != null) {
                 sqlQuery.append(" AND Passenger_Id = ?");
             }
-            if (flightId != null) {
-                sqlQuery.append(" AND Flight_Id = ?");
+            if (flightId != null && !flightId.isEmpty()) {
+                sqlQuery.append(" AND Flight_Id LIKE ?");
             }
             preparedStatement = conn.prepareStatement(sqlQuery.toString());
             int parameterIndex = 1;
@@ -213,15 +213,15 @@ public class DbFunctions {
             if (passengerId != null ) {
                 preparedStatement.setInt(parameterIndex++, passengerId);
             }
-            if (flightId != null ) {
-                preparedStatement.setInt(parameterIndex++, flightId);
+            if (flightId != null && !flightId.isEmpty()) {
+                preparedStatement.setString(parameterIndex++, flightId);
             }
             resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Reservation reservation = new Reservation();
                 reservation.id = (resultSet.getInt("Id"));
                 reservation.passengerId = (resultSet.getInt("Passenger_Id"));
-                reservation.flightId = (resultSet.getInt("Flight_Id"));
+                reservation.flightId= (resultSet.getString("Flight_Id"));
                 reservations.add(reservation);
             }
         } catch (SQLException e) {
@@ -272,7 +272,7 @@ public class DbFunctions {
 
             preparedStatement.setString(parameterIndex++, flightNumber);
             preparedStatement.executeUpdate();
-            System.out.println("Passenger with ID " + flightNumber + " updated successfully.");
+            System.out.println("Flight with ID " + flightNumber + " updated successfully.");
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
