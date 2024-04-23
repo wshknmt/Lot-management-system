@@ -1,14 +1,11 @@
 package org.example;
 
-import java.sql.Connection;
 import java.util.Scanner;
-
 
 public class Main {
 
     public static void main(String[] args) {
-        DbFunctions db = new DbFunctions();
-        Connection conn = db.connect("Lot", "root", "root");
+        DbFunctions db = new DbFunctions("Lot", "root", "root");
         System.out.println();
         System.out.println("            Lot Management System");
         System.out.println();
@@ -19,37 +16,37 @@ public class Main {
             command = scan.next();
             switch (command) {
                 case "add_flight":
-                    ManagementSystem.addFlight(conn);
+                    ManagementSystem.addFlight(db);
                     break;
                 case "delete_flight":
-                    ManagementSystem.deleteFlight(conn);
+                    ManagementSystem.deleteFlight(db);
                     break;
                 case "add_passenger":
-                    ManagementSystem.addPassenger(conn);
+                    ManagementSystem.addPassenger(db);
                     break;
                 case "delete_passenger":
-                    ManagementSystem.deletePassenger(conn);
+                    ManagementSystem.deletePassenger(db);
                     break;
                 case "search_flights":
-                    ManagementSystem.searchFlights(conn);
+                    ManagementSystem.searchFlights(db);
                     break;
                 case "search_passengers":
-                    ManagementSystem.searchPassengers(conn);
+                    ManagementSystem.searchPassengers(db);
                     break;
                 case "search_reservations":
-                    ManagementSystem.searchReservations(conn);
+                    ManagementSystem.searchReservations(db);
                     break;
                 case "book_flight":
-                    ManagementSystem.bookFlight(conn);
+                    ManagementSystem.bookFlight(db);
                     break;
                 case "cancel_flight":
-                    ManagementSystem.cancelFlight(conn);
+                    ManagementSystem.cancelFlight(db);
                     break;
                 case "update_flight":
-                    ManagementSystem.updateFlight(conn);
+                    ManagementSystem.updateFlight(db);
                     break;
                 case "update_passenger":
-                    ManagementSystem.updatePassenger(conn);
+                    ManagementSystem.updatePassenger(db);
                     break;
                 case "exit":
                     System.out.println("Exiting...");

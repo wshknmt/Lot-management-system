@@ -47,7 +47,7 @@ INSERT INTO Flight(Flight_Number, Origin, Destination, Start_Timestamp, Seats_Av
 values('AF1195', 'Lisbon', 'Paris', '2024-04-22 18:50:00', 162);
 
 INSERT INTO Flight(Flight_Number, Origin, Destination, Start_Timestamp, Seats_Available_Amount)
-values('TP1038', 'Lisbon', 'Barcelona', '2024-04-22 19:00:00', 440);
+values('TP1038', 'Lisbon', 'Barcelona', '2024-04-22 19:00:00', 3);
 
 INSERT INTO Passenger(Name, Surname, Phone_Number) VALUES('Ava', 'Johnson', 5551234567);
 INSERT INTO Passenger(Name, Surname, Phone_Number) VALUES('Liam', 'Williams', 5559876543);

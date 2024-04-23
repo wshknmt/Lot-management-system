@@ -1,7 +1,14 @@
 package org.example;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class ReservationDetails {
-    public Reservation reservation;
-    public Passenger passenger;
-    public Flight flight;
+    private Reservation reservation;
+    private Passenger passenger;
+    private Flight flight;
 }

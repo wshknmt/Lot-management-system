@@ -1,7 +1,14 @@
 package org.example;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class Reservation {
-    public Integer id;
-    public Integer passengerId;
-    public String flightId;
+    private Integer id;
+    private Integer passengerId;
+    private String flightId;
 }

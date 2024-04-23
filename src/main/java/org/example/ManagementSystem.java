@@ -1,7 +1,6 @@
 package org.example;
 
 import java.math.BigInteger;
-import java.sql.Connection;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -100,7 +99,7 @@ public class ManagementSystem {
         }
         return true;
     }
-    public static void addFlight(Connection conn) {
+    public static void addFlight(DbFunctions db ) {
         Scanner scan = new Scanner(System.in);
         String command;
         System.out.println("Enter valid flight number");
@@ -121,29 +120,29 @@ public class ManagementSystem {
         command = scan.next();
         Integer seatsAmount = validateSeatsAmount(command);
         if(seatsAmount == null) return;
-        DbFunctions.addNewFlight(conn, flightNumber, origin, destination, localDateTime, seatsAmount);
+        db.addNewFlight(flightNumber, origin, destination, localDateTime, seatsAmount);
     }
 
-    public static void deleteFlight(Connection conn) {
+    public static void deleteFlight(DbFunctions db ) {
         Scanner scan = new Scanner(System.in);
         String command;
         System.out.println("Enter valid flight number");
         command = scan.next();
         if(!validateFlightNumber(command)) return;
         String flightNumber = command.toUpperCase();
-        List<Flight> flights = DbFunctions.searchFlights(conn, flightNumber, null, null, null, null);
+        List<Flight> flights = db.searchFlights(flightNumber, null, null, null, null);
         if(flights.isEmpty()) {
             System.out.println("Flight not found");
         } else {
-            if(DbFunctions.searchReservations(conn, null, null, flights.getFirst().flightNumber).isEmpty()) {
-                DbFunctions.deleteFlight(conn, flightNumber);
+            if(db.searchReservations(null, null, flights.getFirst().getFlightNumber()).isEmpty()) {
+                db.deleteFlight(flightNumber);
                 System.out.println("Flight " + flightNumber + " has ben deleted");
             } else {
                 System.out.println("Cannot delete flight with scheduled reservations");
             }
         }
     }
-    public static void addPassenger(Connection conn) {
+    public static void addPassenger(DbFunctions db) {
         Scanner scan = new Scanner(System.in);
         System.out.println("Enter passenger name");
         String name = scan.next();
@@ -153,30 +152,29 @@ public class ManagementSystem {
         String phoneString = scan.next();
         if(!validateNumber(phoneString)) return;
         BigInteger phoneNumber = new BigInteger(phoneString);
-        DbFunctions.addNewPassenger(conn, name, surname, phoneNumber);
+        db.addNewPassenger(name, surname, phoneNumber);
     }
 
-    public static void deletePassenger(Connection conn) {
+    public static void deletePassenger(DbFunctions db) {
         Scanner scan = new Scanner(System.in);
-        String command;
         System.out.println("Enter valid passenger Id");
         String passengerIdString = scan.next();
         if(!validatePassengerId(passengerIdString)) return;
         int id = Integer.parseInt(passengerIdString);
-        List<Passenger> passengers = DbFunctions.searchPassengers(conn, id, null, null, null);
+        List<Passenger> passengers = db.searchPassengers(id, null, null, null);
         if(passengers.isEmpty()) {
             System.out.println("Passenger not found");
         } else {
-            if(DbFunctions.searchReservations(conn, null, passengers.getFirst().id, null).isEmpty()) {
-                DbFunctions.deletePassenger(conn, id);
-                System.out.println("Passenger " + passengers.getFirst().name + " " + passengers.getFirst().surname + " has ben deleted");
+            if(db.searchReservations(null, passengers.getFirst().getId(), null).isEmpty()) {
+                db.deletePassenger(id);
+                System.out.println("Passenger " + passengers.getFirst().getName() + " " + passengers.getFirst().getSurname() + " has ben deleted");
             } else {
                 System.out.println("Cannot delete passenger with scheduled reservations");
             }
         }
     }
 
-    public static void searchFlights(Connection conn) {
+    public static void searchFlights(DbFunctions db) {
         Scanner scan = new Scanner(System.in);
         String command;
         System.out.println("Enter flight number or leave field empty");
@@ -199,7 +197,7 @@ public class ManagementSystem {
         if(flightNumber.isEmpty()) flightNumber = null;
         if(origin.isEmpty()) origin = null;
         if(destination.isEmpty()) destination = null;
-        List<Flight> flights = DbFunctions.searchFlights(conn, flightNumber, origin, destination, localDateTime, seatsAmount);
+        List<Flight> flights = db.searchFlights(flightNumber, origin, destination, localDateTime, seatsAmount);
         if (!flights.isEmpty()) {
             printFlights(flights);
         } else {
@@ -207,7 +205,7 @@ public class ManagementSystem {
         }
     }
 
-    public static void searchPassengers(Connection conn) {
+    public static void searchPassengers(DbFunctions db) {
         Scanner scan = new Scanner(System.in);
         System.out.println("Enter passenger id or leave field empty");
         String idString = scan.nextLine();
@@ -240,7 +238,7 @@ public class ManagementSystem {
         if(name.isEmpty()) name = null;
         if(surname.isEmpty()) surname = null;
 
-        List<Passenger> passengers = DbFunctions.searchPassengers(conn, passengerId, name, surname, phoneNumber);
+        List<Passenger> passengers = db.searchPassengers(passengerId, name, surname, phoneNumber);
         if (!passengers.isEmpty()) {
             printPassengers(passengers);
         } else {
@@ -248,19 +246,19 @@ public class ManagementSystem {
         }
     }
 
-    public static void searchReservations(Connection conn) {
+    public static void searchReservations(DbFunctions db) {
         Scanner scan = new Scanner(System.in);
         System.out.println("Enter reservation id or leave field empty");
         String idReservationString = scan.nextLine();
-        Integer reservstionId;
+        Integer reservationId;
         if (!idReservationString.isEmpty()) {
             if(!validateReservationId(idReservationString)) {
                 System.out.println("Incorrect reservation id");
                 return;
             }
-            reservstionId = Integer.parseInt(idReservationString);
+            reservationId = Integer.parseInt(idReservationString);
         } else {
-            reservstionId = null;
+            reservationId = null;
         }
         System.out.println("Enter passenger id or leave field empty");
         String idPassengerString = scan.nextLine();
@@ -276,7 +274,7 @@ public class ManagementSystem {
         }
         System.out.println("Enter flight number or leave field empty");
         String flightNumber = scan.nextLine();
-        List<ReservationDetails> reservations = DbFunctions.searchReservations(conn, reservstionId, passengerId, flightNumber);
+        List<ReservationDetails> reservations = db.searchReservations(reservationId, passengerId, flightNumber);
         if (!reservations.isEmpty()) {
             printReservations(reservations);
         } else {
@@ -284,7 +282,7 @@ public class ManagementSystem {
         }
     }
 
-    public static void bookFlight(Connection conn) {
+    public static void bookFlight(DbFunctions db ) {
         Scanner scan = new Scanner(System.in);
         System.out.println("Enter passenger id");
         String idPassengerString = scan.next();
@@ -294,41 +292,41 @@ public class ManagementSystem {
         System.out.println("Enter flight number");
         String flightNumber = scan.next();
         if(!validateFlightNumber(flightNumber)) return;
-        Passenger passenger = DbFunctions.searchPassengers(conn, passengerId, null, null, null).getFirst();
+        Passenger passenger = db.searchPassengers(passengerId, null, null, null).getFirst();
         if(passenger == null) {
             System.out.println("Passenger not found");
             return;
         }
-        Flight flight = DbFunctions.searchFlights(conn, flightNumber, null, null, null, null).getFirst();
+        Flight flight = db.searchFlights(flightNumber, null, null, null, null).getFirst();
         if(flight == null) {
             System.out.println("Flight not found");
             return;
-        } else if(flight.seatsAvailableAmount <= 0) {
+        } else if(flight.getSeatsAvailableAmount() <= 0) {
             System.out.println("No available seats in this flight");
             return;
         }
-        DbFunctions.addNewReservation(conn, passengerId, flightNumber);
-        DbFunctions.updateFlight(conn, flightNumber, null, null, null, flight.seatsAvailableAmount - 1);
+        db.addNewReservation(passengerId, flightNumber);
+        db.updateFlight(flightNumber, null, null, null, flight.getSeatsAvailableAmount() - 1);
     }
 
-    public static void cancelFlight(Connection conn) {
+    public static void cancelFlight(DbFunctions db) {
         Scanner scan = new Scanner(System.in);
         System.out.println("Enter reservation id");
         String idReservationString = scan.next();
         Integer reservationId;
         if(!validateReservationId(idReservationString)) return;
         reservationId = Integer.parseInt(idReservationString);
-        ReservationDetails reservation = DbFunctions.searchReservations(conn, reservationId,null, null).getFirst();
+        ReservationDetails reservation = db.searchReservations(reservationId,null, null).getFirst();
         if(reservation == null) {
             System.out.println("Reservation not found");
             return;
         }
-        DbFunctions.deleteReservation(conn, reservationId);
-        Flight flight = DbFunctions.searchFlights(conn, reservation.flight.flightNumber, null, null, null, null).getFirst();
-        DbFunctions.updateFlight(conn, flight.flightNumber, null, null, null, flight.seatsAvailableAmount + 1);
+        db.deleteReservation(reservationId);
+        Flight flight = db.searchFlights(reservation.getFlight().getFlightNumber(), null, null, null, null).getFirst();
+        db.updateFlight(flight.getFlightNumber(), null, null, null, flight.getSeatsAvailableAmount() + 1);
     }
 
-    public static void updateFlight(Connection conn) {
+    public static void updateFlight(DbFunctions db) {
         Scanner scan = new Scanner(System.in);
         String command;
         System.out.println("Enter flight number");
@@ -352,15 +350,15 @@ public class ManagementSystem {
         if(flightNumber.isEmpty()) flightNumber = null;
         if(origin.isEmpty()) origin = null;
         if(destination.isEmpty()) destination = null;
-        List<Flight> flights = DbFunctions.searchFlights(conn, flightNumber, null, null, null, null);
+        List<Flight> flights = db.searchFlights(flightNumber, null, null, null, null);
         if (!flights.isEmpty()) {
-            DbFunctions.updateFlight(conn, flightNumber, origin, destination, localDateTime, seatsAmount);
+            db.updateFlight(flightNumber, origin, destination, localDateTime, seatsAmount);
         } else {
             System.out.println("No data found for provided flight number");
         }
     }
 
-    public static void updatePassenger(Connection conn) {
+    public static void updatePassenger(DbFunctions db) {
         Scanner scan = new Scanner(System.in);
         System.out.println("Enter passenger id");
         String idString = scan.nextLine();
@@ -386,9 +384,9 @@ public class ManagementSystem {
         if(name.isEmpty()) name = null;
         if(surname.isEmpty()) surname = null;
 
-        List<Passenger> passengers = DbFunctions.searchPassengers(conn, passengerId, null, null, null);
+        List<Passenger> passengers = db.searchPassengers(passengerId, null, null, null);
         if (!passengers.isEmpty()) {
-            DbFunctions.updatePassenger(conn, passengerId, name, surname, phoneNumber);
+            db.updatePassenger(passengerId, name, surname, phoneNumber);
         } else {
             System.out.println("No data found for provided passenger id");
         }
@@ -397,51 +395,51 @@ public class ManagementSystem {
     public static void printFlights(List<Flight> flights) {
         int iter = 1;
         for (Flight flight : flights) {
-            System.out.println(iter++ +". Flight Number: " + flight.flightNumber);
-            System.out.println("Origin: " + flight.origin);
-            System.out.println("Destination: " + flight.destination);
-            System.out.println("Start Time: " + flight.startTimestamp);
-            System.out.println("Seats Available: " + flight.seatsAvailableAmount);
+            System.out.println(iter++ +". Flight Number: " + flight.getFlightNumber());
+            System.out.println("Origin: " + flight.getOrigin());
+            System.out.println("Destination: " + flight.getDestination());
+            System.out.println("Start Time: " + flight.getStartTimestamp());
+            System.out.println("Seats Available: " + flight.getSeatsAvailableAmount());
             System.out.println();
         }
     }
     public static void printPassengers(List<Passenger> passengers) {
         int iter = 1;
         for (Passenger passenger : passengers) {
-            System.out.println(iter++ +". Id: " + passenger.id);
-            System.out.println("Name: " + passenger.name);
-            System.out.println("Surname: " + passenger.surname);
-            System.out.println("Phone number " + passenger.phoneNumber);
+            System.out.println(iter++ +". Id: " + passenger.getId());
+            System.out.println("Name: " + passenger.getName());
+            System.out.println("Surname: " + passenger.getSurname());
+            System.out.println("Phone number " + passenger.getPhoneNumber());
             System.out.println();
         }
     }
     public static void printReservations(List<ReservationDetails> reservations) {
         int iter = 1;
         for (ReservationDetails reservation : reservations) {
-            System.out.println(iter++ +". Id: " + reservation.reservation.id);
-            System.out.println("Passenger Name: " + reservation.passenger.name);
-            System.out.println("Passenger Surname: " + reservation.passenger.surname);
-            System.out.println("Flight Number: " + reservation.flight.flightNumber);
-            System.out.println("From: " + reservation.flight.origin);
-            System.out.println("To: " + reservation.flight.destination);
-            System.out.println("Date: " + reservation.flight.startTimestamp);
+            System.out.println(iter++ +". Id: " + reservation.getReservation().getId());
+            System.out.println("Passenger Name: " + reservation.getPassenger().getName());
+            System.out.println("Passenger Surname: " + reservation.getPassenger().getSurname());
+            System.out.println("Flight Number: " + reservation.getFlight().getFlightNumber());
+            System.out.println("From: " + reservation.getFlight().getOrigin());
+            System.out.println("To: " + reservation.getFlight().getDestination());
+            System.out.println("Date: " + reservation.getFlight().getStartTimestamp());
             System.out.println();
         }
     }
     public static void printHelp() {
         System.out.println("Choose one of the commands below");
-        System.out.println("add_flight");
-        System.out.println("delete_flight");
-        System.out.println("add_passenger");
-        System.out.println("delete_passenger");
-        System.out.println("search_flights");
-        System.out.println("search_passengers");
-        System.out.println("search_reservations");
-        System.out.println("book_flight");
-        System.out.println("cancel_flight");
-        System.out.println("update_flight");
-        System.out.println("update_passenger");
-        System.out.println("exit");
-        System.out.println("help");
+        System.out.println("* add_flight");
+        System.out.println("* delete_flight");
+        System.out.println("* add_passenger");
+        System.out.println("* delete_passenger");
+        System.out.println("* search_flights");
+        System.out.println("* search_passengers");
+        System.out.println("* search_reservations");
+        System.out.println("* book_flight");
+        System.out.println("* cancel_flight");
+        System.out.println("* update_flight");
+        System.out.println("* update_passenger");
+        System.out.println("* exit");
+        System.out.println("* help");
     }
 }
