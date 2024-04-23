@@ -276,7 +276,7 @@ public class ManagementSystem {
         }
         System.out.println("Enter flight number or leave field empty");
         String flightNumber = scan.nextLine();
-        List<Reservation> reservations = DbFunctions.searchReservations(conn, reservstionId, passengerId, flightNumber);
+        List<ReservationDetails> reservations = DbFunctions.searchReservations(conn, reservstionId, passengerId, flightNumber);
         if (!reservations.isEmpty()) {
             printReservations(reservations);
         } else {
@@ -318,13 +318,13 @@ public class ManagementSystem {
         Integer reservationId;
         if(!validateReservationId(idReservationString)) return;
         reservationId = Integer.parseInt(idReservationString);
-        Reservation reservation = DbFunctions.searchReservations(conn, reservationId,null, null).getFirst();
+        ReservationDetails reservation = DbFunctions.searchReservations(conn, reservationId,null, null).getFirst();
         if(reservation == null) {
             System.out.println("Reservation not found");
             return;
         }
         DbFunctions.deleteReservation(conn, reservationId);
-        Flight flight = DbFunctions.searchFlights(conn, reservation.flightId, null, null, null, null).getFirst();
+        Flight flight = DbFunctions.searchFlights(conn, reservation.flight.flightNumber, null, null, null, null).getFirst();
         DbFunctions.updateFlight(conn, flight.flightNumber, null, null, null, flight.seatsAvailableAmount + 1);
     }
 
@@ -415,12 +415,16 @@ public class ManagementSystem {
             System.out.println();
         }
     }
-    public static void printReservations(List<Reservation> reservations) {
+    public static void printReservations(List<ReservationDetails> reservations) {
         int iter = 1;
-        for (Reservation reservation : reservations) {
-            System.out.println(iter++ +". Id: " + reservation.id);
-            System.out.println("Passenger Id: " + reservation.passengerId);
-            System.out.println("Flight Number: " + reservation.flightId);
+        for (ReservationDetails reservation : reservations) {
+            System.out.println(iter++ +". Id: " + reservation.reservation.id);
+            System.out.println("Passenger Name: " + reservation.passenger.name);
+            System.out.println("Passenger Surname: " + reservation.passenger.surname);
+            System.out.println("Flight Number: " + reservation.flight.flightNumber);
+            System.out.println("From: " + reservation.flight.origin);
+            System.out.println("To: " + reservation.flight.destination);
+            System.out.println("Date: " + reservation.flight.startTimestamp);
             System.out.println();
         }
     }

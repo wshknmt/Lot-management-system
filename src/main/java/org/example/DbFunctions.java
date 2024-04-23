@@ -189,12 +189,15 @@ public class DbFunctions {
         return passengers;
     }
 
-    public static List<Reservation> searchReservations(Connection conn, Integer id, Integer passengerId, String flightId) {
-        List<Reservation> reservations = new ArrayList<>();
+    public static List<ReservationDetails> searchReservations(Connection conn, Integer id, Integer passengerId, String flightId) {
+        List<ReservationDetails> reservationsDetails = new ArrayList<>();
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
-            StringBuilder sqlQuery = new StringBuilder("SELECT * FROM Reservation WHERE 1=1");
+            StringBuilder sqlQuery = new StringBuilder("SELECT r.*, f.*, p.* FROM Reservation r");
+            sqlQuery.append(" INNER JOIN Flight f ON r.Flight_Id = f.Flight_Number");
+            sqlQuery.append(" INNER JOIN Passenger p ON r.Passenger_Id = p.Id");
+            sqlQuery.append(" WHERE 1=1");
 
             if (id != null) {
                 sqlQuery.append(" AND Id = ?");
@@ -218,11 +221,30 @@ public class DbFunctions {
             }
             resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
+                ReservationDetails reservationDetails = new ReservationDetails();
                 Reservation reservation = new Reservation();
                 reservation.id = (resultSet.getInt("Id"));
                 reservation.passengerId = (resultSet.getInt("Passenger_Id"));
                 reservation.flightId= (resultSet.getString("Flight_Id"));
-                reservations.add(reservation);
+
+                Passenger passenger = new Passenger();
+                passenger.id = resultSet.getInt("Id");
+                passenger.name = resultSet.getString("Name");
+                passenger.surname = resultSet.getString("Surname");
+                passenger.phoneNumber = BigInteger.valueOf(resultSet.getLong("Phone_Number"));
+
+                Flight flight = new Flight();
+                flight.flightNumber = (resultSet.getString("Flight_Number"));
+                flight.origin = (resultSet.getString("Origin"));
+                flight.destination = (resultSet.getString("Destination"));
+                flight.startTimestamp = (resultSet.getTimestamp("Start_Timestamp")).toLocalDateTime();
+                flight.seatsAvailableAmount = (resultSet.getInt("Seats_Available_Amount"));
+
+                reservationDetails.reservation = reservation;
+                reservationDetails.passenger = passenger;
+                reservationDetails.flight = flight;
+
+                reservationsDetails.add(reservationDetails);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -234,7 +256,7 @@ public class DbFunctions {
                 e.printStackTrace();
             }
         }
-        return reservations;
+        return reservationsDetails;
     }
 
     public static void updateFlight(Connection conn, String flightNumber, String origin, String destination, LocalDateTime startTime, Integer seatsAvailable) {

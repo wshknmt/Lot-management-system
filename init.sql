@@ -60,4 +60,13 @@ INSERT INTO Passenger(Name, Surname, Phone_Number) VALUES('Oliver', 'Harris', 55
 INSERT INTO Passenger(Name, Surname, Phone_Number) VALUES('Amelia', 'Walker', 5556789012);
 INSERT INTO Passenger(Name, Surname, Phone_Number) VALUES('Ethan', 'Clark', 5550123456);
 
-
+INSERT INTO Reservation(Passenger_Id, Flight_Id) VALUES(2, 'AT983');
+INSERT INTO Reservation(Passenger_Id, Flight_Id) VALUES(4, 'W61307');
+INSERT INTO Reservation(Passenger_Id, Flight_Id) VALUES(4, 'SN2556');
+INSERT INTO Reservation(Passenger_Id, Flight_Id) VALUES(7, 'W61307');
+INSERT INTO Reservation(Passenger_Id, Flight_Id) VALUES(8, 'SN2556');
+INSERT INTO Reservation(Passenger_Id, Flight_Id) VALUES(3, 'LO225');
+INSERT INTO Reservation(Passenger_Id, Flight_Id) VALUES(6, 'W61307');
+INSERT INTO Reservation(Passenger_Id, Flight_Id) VALUES(1, 'LH1615');
+INSERT INTO Reservation(Passenger_Id, Flight_Id) VALUES(2, 'LH1615');
+INSERT INTO Reservation(Passenger_Id, Flight_Id) VALUES(6, 'HV5244');

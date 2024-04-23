@@ -61,22 +61,5 @@ public class Main {
                     System.out.println("Wrong command");
             }
         } while (!command.equals("exit"));
-
-//        LocalDateTime timestamp = LocalDateTime.of(2024, 4, 22, 12, 30);
-//        List<Flight> flights = db.searchFlights(conn, null, null, null, null, null);
-//        if (!flights.isEmpty()) {
-//            printFlights(flights);
-//        } else {
-//            System.out.println("No data found for the specified criteria");
-//        }
-//
-//        db.updateFlight(conn, "AT983", null, "Warsaw", null, null);
-//        List<Passenger> passengers = db.searchPassengers(conn, null, null, null, null);
-//        if (!passengers.isEmpty()) {
-//            printPassengers(passengers);
-//        } else {
-//            System.out.println("No data found for the specified criteria");
-//        }
-
     }
 }
